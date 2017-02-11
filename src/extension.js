@@ -3,13 +3,6 @@ let path = require('path');
 let fs = require('fs');
 let utils = require('./utils');
 
-// TODO: find a way to have the extension auto update the package dependency, instead of having an update to VSCode extension.
-// TODO: try to optimize time spent in this method.
-// instead of enumerating all the installed npm packages every time on activation. drop a file to this extension's install path
-// after installing dependencies. after the first time, just check for the presence of that sentinel file and bail.
-// that does not ensure the dependency will always exist though. 
-// TODO: check for package version updates and re-install if necessary.
-
 // Called once to activate the extension.
 // The only thing this extension needs to do is to ensure that a certain npm package is installed globally.
 // Ideally this should be done during install time, but VSCode does not support install time tasks.
@@ -35,7 +28,7 @@ function ensureDependenciesAreInstalled() {
     // Download and install template generator package.
     var extensionName = 'Azure-Node-Essentials';
     var generatorPackageName = 'generator-azure-node';
-    var generatorPackageVersion = '0.1.0'; // TODO: query npm and obtain latest version. That would mean updating package would not require an extension update.
+    var generatorPackageVersion = '0.1.0';
 
     utils.isNodeInstalled().then(function (result) {
         if (!result) {
