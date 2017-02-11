@@ -30,7 +30,7 @@ This extension provides tools for NodeJs developers working with Azure SDKs.
 
 ### Code generation
 
-1. #### template deployment
+#### 1. template deployment
 
 ![Code gen for template deployment](resources/help/codegen-templatedeploy.gif)
 
