@@ -1,5 +1,14 @@
 # Change Log for Azure Node Essentials
 
+## 0.2.4 [2017-02-11]
+
+1. re-organized source code folder structure and refactored source code
+1. moved project to new home page at [Azure/Azure Node Essentials](https://github.com/Azure/azure-node-essentials)
+1. improvements to codegeneration:
+    * better formatting for generated code and target document.
+    * smarter require statement code generation: we only import modules that are not already imported and insert require statements at the end of an existing group, if one exists.
+    * code generator for package.json: we now update package.json with dependencies required by the generated code.
+
 ## 0.2.3 [2017-02-08]
 
 1. Bug fixes for Mac
