@@ -18,6 +18,22 @@ This extension provides tools for NodeJs developers working with Azure SDKs.
 1. Code generation scenarios
    * command `Azure-Node: Generate code for template deployment` : generate code for template deployment
 
+## Demo
+
+### Project Scaffolding
+
+![Project Scaffolding](resources/help/project-scaffolding.gif)
+
+### Snippets
+
+![Snippets](resources/help/snippets.gif)
+
+### Code generation
+
+1. #### template deployment
+
+![Code gen for template deployment](resources/help/codegen-templatedeploy.gif)
+
 ### Sample workflow
 
 1. Open VS code with an empty workspace (empty folder)
