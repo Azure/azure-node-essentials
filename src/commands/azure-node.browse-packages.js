@@ -1,41 +1,44 @@
 var fs = require('fs');
 var vscode = require('vscode');
-var codegen = require('../codegen/codgen.template-deploy');
+var npmUserPackages = require('npm-user-packages');
 var jsonEditor = require('../codegen/jsoneditor');
 var utils = require('../utils');
+var codegen = require('../codegen/codegen.browse-packages');
 
 exports.createCommand = function createCommand() {
-  vscode.commands.registerCommand('Azure-Node.template-deploy', function () {
+  vscode.commands.registerCommand('Azure-Node.browse-packages', function () {
+    npmUserPackages('windowsazure').then(data => {
+      var pkgs = [];
+      data.forEach(function (item) {
+        pkgs.push({ "label": item.name, "description": item.version, "detail": item.description });
+      });
 
-    if (!vscode.window.activeTextEditor) {
-      vscode.window.showInformationMessage(`please open a .js file in the editor and then use this code generator command.`);
-      return;
-    }
-
-    // update package.json
-    updatePackageJson();
-
-    // generate code in current document
-    return generateCodeInEditor();
+      vscode.window.showQuickPick(pkgs).then((selectedItem) => {
+        updatePackageJson(selectedItem.label);
+        
+        if (!vscode.window.activeTextEditor) {
+          return;
+        }
+        
+        return generateCodeInEditor(selectedItem.label);
+      });
+    });
   });
 };
 
-function updatePackageJson() {
+function updatePackageJson(packageToAdd) {
   var filePath = utils.getPackageJsonPath();
 
   if (filePath && fs.existsSync(filePath)) {
-    var packages = codegen.getPackageDependencies();
+    var packages = [packageToAdd];
     jsonEditor.addDependenciesIfRequired(filePath, packages);
   }
 };
 
-function generateCodeInEditor() {
+function generateCodeInEditor(moduleName) {
   // generate code to be inserted.
   const document = vscode.window.activeTextEditor.document;
-  const lineCount = document.lineCount;
-  var importsAndLineNumber = codegen.generateRequireStatements(document);
-  var methodBody = codegen.deployTemplate();
-  var callsite = codegen.deployTemplateCallSite();
+  var importsAndLineNumber = codegen.generateRequireStatements(document, [moduleName]);
 
   vscode.window.activeTextEditor.edit((builder) => {
     // insert import statements.
@@ -47,14 +50,6 @@ function generateCodeInEditor() {
         builder.insert(importPos, importStatement);
       }
     }
-
-    // insert code for template deployment.
-    const range = new vscode.Range(new vscode.Position(lineCount, 0), new vscode.Position(lineCount + 1, 0));
-    builder.replace(range, methodBody);
-
-    // fix callsite to invoke the function that was newly generated.
-    const currentPos = new vscode.Position(vscode.window.activeTextEditor.selection.active.line, 0);
-    builder.insert(currentPos, callsite);
   });
 
   // format the entire document.

@@ -45,12 +45,18 @@
                 "command": "Azure-Node.template-deploy",
                 "title": "Generate code for template deployment",
                 "category": "Azure-Node"
+            },
+            {
+                "command": "Azure-Node.browse-packages",
+                "title": "Browse Azure-SDK packages",
+                "category": "Azure-Node"
             }
         ]
     },
     "scripts": {},
     "dependencies": {
         "npm": "*",
+        "npm-user-packages": "^2.0.0",
         "escodegen": "^1.8.1",
         "esprima": "^3.1.3"
     },

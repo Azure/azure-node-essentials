@@ -1,3 +1,6 @@
+var fs = require('fs');
+var path = require('path');
+var vscode = require('vscode');
 let exec = require('child_process').exec;
 
 // checks if there exists a valid installation of NodeJs on this machine
@@ -82,3 +85,28 @@ exports.npmInstall = function npmInstall(packages, opts) {
         });
     });
 };
+
+exports.getPackageJsonPath = function getPackageJsonPath(){
+  var dirAboveRoot = path.join(vscode.workspace.rootPath, '..');
+  var srcPath = getSourceLocation();
+  var packageJsonPath;
+
+  while (srcPath !== dirAboveRoot) {
+    packageJsonPath = path.join(srcPath, 'package.json');
+    if(fs.existsSync(packageJsonPath)){
+      return packageJsonPath;
+    }
+    else{
+      srcPath = path.join(srcPath, '..');
+    }
+  }
+};
+
+function getSourceLocation() {
+  var files = vscode.workspace.textDocuments.filter(item => item.isUntitled === false);
+  if (files) {
+    var sourceFile = files[0].fileName;
+    return sourceFile.slice(0, sourceFile.lastIndexOf('\\') + 1);
+  }
+}
+
