@@ -14,6 +14,10 @@ exports.createCommand = function createCommand() {
       });
 
       vscode.window.showQuickPick(pkgs).then((selectedItem) => {
+        if(!selectedItem){
+          return;
+        }
+        
         updatePackageJsonAndNpmInstall(selectedItem.label);
 
         if (!vscode.window.activeTextEditor) {
