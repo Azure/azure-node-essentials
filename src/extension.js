@@ -28,7 +28,7 @@ function ensureDependenciesAreInstalled() {
     // Download and install template generator package.
     var extensionName = 'Azure-Node-Essentials';
     var generatorPackageName = 'generator-azure-node';
-    var generatorPackageVersion = '0.1.0';
+    var generatorPackageVersion = '0.1.1';
 
     utils.isNodeInstalled().then(function (result) {
         if (!result) {
