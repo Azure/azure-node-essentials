@@ -14,24 +14,35 @@ exports.createCommand = function createCommand() {
       });
 
       vscode.window.showQuickPick(pkgs).then((selectedItem) => {
-        updatePackageJson(selectedItem.label);
-        
+        updatePackageJsonAndNpmInstall(selectedItem.label);
+
         if (!vscode.window.activeTextEditor) {
           return;
         }
-        
+
         return generateCodeInEditor(selectedItem.label);
       });
     });
   });
 };
 
-function updatePackageJson(packageToAdd) {
+function updatePackageJsonAndNpmInstall(packageToAdd) {
   var filePath = utils.getPackageJsonPath();
 
   if (filePath && fs.existsSync(filePath)) {
     var packages = [packageToAdd];
     jsonEditor.addDependenciesIfRequired(filePath, packages);
+    
+    // TODO: run npm-install only if package.json was touched
+    var installTask = utils.npmInstall(packages, { global: false });
+    return installTask.then(
+      function onFulfilled(value) {
+        vscode.window.setStatusBarMessage(`npm install succeeded for ${packageToAdd}.`);
+      },
+      function onRejected(reason) {
+        vscode.window.setStatusBarMessage(`npm install failed for ${packageToAdd}.`);        
+      }
+    );
   }
 };
 

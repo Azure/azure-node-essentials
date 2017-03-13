@@ -13,19 +13,30 @@ exports.createCommand = function createCommand() {
     }
 
     // update package.json
-    updatePackageJson();
+    updatePackageJsonAndNpmInstall();
 
     // generate code in current document
     return generateCodeInEditor();
   });
 };
 
-function updatePackageJson() {
+function updatePackageJsonAndNpmInstall() {
   var filePath = utils.getPackageJsonPath();
 
   if (filePath && fs.existsSync(filePath)) {
     var packages = codegen.getPackageDependencies();
     jsonEditor.addDependenciesIfRequired(filePath, packages);
+
+    // TODO: run npm-install only if package.json was touched
+    var installTask = utils.npmInstall(packages, { global: false });
+    return installTask.then(
+      function onFulfilled(value) {
+        vscode.window.setStatusBarMessage(`npm install succeeded.`);
+      },
+      function onRejected(reason) {
+        vscode.window.setStatusBarMessage(`npm install failed.`);
+      }
+    );
   }
 };
 
