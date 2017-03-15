@@ -28,6 +28,10 @@ This extension provides tools for NodeJs developers working with Azure SDKs.
 
 ![Snippets](resources/help/snippets.gif)
 
+### Package browsing
+
+![Package browsing](resources/help/package-browsing.gif)
+
 ### Code generation
 
 #### 1. template deployment

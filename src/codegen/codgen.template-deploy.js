@@ -6,7 +6,6 @@ const deployTemplateFunctionName = 'deployTemplate';
 exports.deployTemplate = function deployTemplate() {
   var text = `function ${deployTemplateFunctionName}(credentials, callback){\
       // TODO: initialize these variables
-      var subscriptionId;\
       var resourceGroupName;\
       var deploymentName;\
       var templateFilePath;\
@@ -23,7 +22,7 @@ exports.deployTemplate = function deployTemplate() {
         template = JSON.parse(fs.readFileSync(templateFilePath));\
         templateParameters = JSON.parse(fs.readFileSync(templateParametersFilePath));\
       } catch (error) {\
-        console.error('Encountered error parsing template file:', error);\
+        callback(error);\
       }\
       \r\n
       var resourceClient = new ResourceManagement.ResourceManagementClient(credentials, subscriptionId);\
@@ -39,7 +38,10 @@ exports.generateRequireStatements = function generateRequireStatements(document)
 };
 
 exports.deployTemplateCallSite = function deployTemplateCallSite() {
-  var text = `${deployTemplateFunctionName}(credentials, function(err, result){ });`;
+  var text = `${deployTemplateFunctionName}(credentials, function(err, result){\
+     if(err) return console.log(err);\
+     console.log('template deployed to azure!');\
+   });`;
   return codegenerator.generateCode(text);
 };
 
