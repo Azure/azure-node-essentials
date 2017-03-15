@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var vscode = require('vscode');
 var npmUserPackages = require('npm-user-packages');
 var jsonEditor = require('../codegen/jsoneditor');
@@ -38,12 +39,16 @@ function updatePackageJsonAndNpmInstall(packageToAdd) {
     jsonEditor.addDependenciesIfRequired(filePath, packages);
     
     // TODO: run npm-install only if package.json was touched
-    var installTask = utils.npmInstall(packages, { global: false });
+    var npmOptions = {
+      prefix: filePath.slice(0, filePath.lastIndexOf(path.sep))
+    };
+
+    var installTask = utils.npmInstall(packages, npmOptions);
     return installTask.then(
-      function onFulfilled(value) {
+      function onFulfilled() {
         vscode.window.setStatusBarMessage(`npm install succeeded for ${packageToAdd}.`);
       },
-      function onRejected(reason) {
+      function onRejected() {
         vscode.window.setStatusBarMessage(`npm install failed for ${packageToAdd}.`);        
       }
     );

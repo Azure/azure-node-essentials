@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var vscode = require('vscode');
 let exec = require('child_process').exec;
+var npm = require('npm');
 
 // checks if there exists a valid installation of NodeJs on this machine
 exports.isNodeInstalled = function isNodeInstalled() {
@@ -73,7 +74,8 @@ exports.npmInstall = function npmInstall(packages, opts) {
     var cmdString = "npm install " + packages.join(" ") + " "
         + (opts.global ? " -g" : "")
         + (opts.save ? " --save" : "")
-        + (opts.saveDev ? " --saveDev" : "");
+        + (opts.saveDev ? " --saveDev" : "")
+        + (opts.prefix ? " --prefix " + opts.prefix : "");
 
     return new Promise(function (resolve, reject) {
         exec(cmdString, { cwd: opts.cwd ? opts.cwd : "/" }, (error) => {
@@ -113,3 +115,24 @@ function getSourceLocation() {
     }
 }
 
+exports.install = function install(pkgName, options) {
+    var promise = new Promise(function (resolve, reject) {
+        if (!options) {
+            reject("options.prefix is required.");
+        }
+
+        npm.load(options, function (err) {
+            if (err) {
+                return reject(err);
+            }
+            npm.commands.install([pkgName + '@latest'], function (err, info) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(info);
+            });
+        });
+    });
+
+    return promise;
+};
