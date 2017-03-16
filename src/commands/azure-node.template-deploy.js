@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var os = require('os');
 var vscode = require('vscode');
 var codegen = require('../codegen/codgen.template-deploy');
 var jsonEditor = require('../codegen/jsoneditor');
@@ -66,7 +67,7 @@ function generateCodeInEditor() {
 
     // insert code for template deployment.
     const range = new vscode.Range(new vscode.Position(lineCount, 0), new vscode.Position(lineCount + 1, 0));
-    builder.replace(range, methodBody);
+    builder.replace(range, os.EOL + methodBody);
 
     // fix callsite to invoke the function that was newly generated.
     const currentPos = new vscode.Position(vscode.window.activeTextEditor.selection.active.line, 0);
