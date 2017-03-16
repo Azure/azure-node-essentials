@@ -79,9 +79,13 @@ exports.getNameAssignmentForModule = function getNameAssignmentForModule(module)
     case 'ms-rest-azure':
       return 'msRestAzure';
     default:
-      return;
+      return getDefaultName(module);
   }
 };
+
+function getDefaultName(module){
+  return module.split('-').map(v => v.charAt(0).toUpperCase() + v.slice(1)).join('');
+}
 
 exports.generateNewLine = function generateNewLine() {
   return this.generateCode('\r\n');
