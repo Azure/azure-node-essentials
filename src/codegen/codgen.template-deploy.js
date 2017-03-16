@@ -12,11 +12,6 @@ exports.deployTemplate = function deployTemplate() {
       var templateParametersFilePath;\
       var template;\
       var templateParameters;\
-      var parameters = {\
-        template: template,\
-        parameters: templateParameters,\
-        mode: \'Complete\'\
-      };\
       \r\n
       try {\
         template = JSON.parse(fs.readFileSync(templateFilePath));\
@@ -24,6 +19,17 @@ exports.deployTemplate = function deployTemplate() {
       } catch (error) {\
         callback(error);\
       }\
+      \r\n
+      if (templateParameters.parameters)\
+        templateParameters = templateParameters.parameters;\
+      \r\n
+      var parameters = {\
+        properties: {\
+          template: template,\
+          parameters: templateParameters,\
+          mode: \'Complete\'\
+        }\
+      };\
       \r\n
       var resourceClient = new ResourceManagement.ResourceManagementClient(credentials, subscriptionId);\
       resourceClient.deployments.createOrUpdate(resourceGroupName, deploymentName, parameters, callback);\

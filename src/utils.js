@@ -111,7 +111,7 @@ function getSourceLocation() {
     var files = vscode.workspace.textDocuments.filter(item => item.isUntitled === false);
     if (files) {
         var sourceFile = files[0].fileName;
-        return sourceFile.slice(0, sourceFile.lastIndexOf('\\') + 1);
+        return sourceFile.slice(0, sourceFile.lastIndexOf(path.sep) + 1);
     }
 }
 
