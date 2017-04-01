@@ -1,6 +1,6 @@
 # Change Log for Azure Node Essentials
 
-## 0.2.5 [2017-03-10]
+## 0.2.5 [2017-04-01]
 
 1. Package browsing for azure sdks.
 1. auto install packages if any were added to package.json by running npm install in the background.
