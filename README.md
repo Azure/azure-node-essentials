@@ -15,6 +15,8 @@ This extension provides tools for NodeJs developers working with Azure SDKs.
    * `loginPwd` : generate code for logging in with username and password
    * `loginSp`  : generate code for logging in with a service principal
    * `spCreate` : generate code to create a service principal
+1. Search and Install Azure packages from NPM
+   * command `Azure-Node: Browse Azure-SDK Packages` : type to filter by matching name, enter to npm-install it locally
 1. Code generation scenarios
    * command `Azure-Node: Generate code for template deployment` : generate code for template deployment
 
