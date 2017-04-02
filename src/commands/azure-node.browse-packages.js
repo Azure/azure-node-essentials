@@ -14,8 +14,8 @@ exports.createCommand = function createCommand(state) {
   const PATH = 'readme.md';
   // Since we want to reuse a single preview pane, we define one uri up front to reuse.
   const URI = new vscode.Uri().with({ scheme: SCHEME, path: PATH });
-  const pathProvider = (filename) => filename;
-  const provider = new FileContentProvider(URI, pathProvider);
+  const contentResolver = (filename) => utils.getPackageReadMe(filename);
+  const provider = new FileContentProvider(URI, contentResolver);
   vscode.workspace.registerTextDocumentContentProvider(SCHEME, provider);
 
   vscode.commands.registerCommand('Azure-Node.browse-packages', function () {

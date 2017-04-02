@@ -1,13 +1,12 @@
 'use strict';
 const vscode = require("vscode");
-const utils = require('../utils');
 
 class FileContentProvider {
-    constructor(uri, pathProvider) {
+    constructor(uri, contentResolver) {
         this._onDidChange = new vscode.EventEmitter();
         this.uri = uri;
         this.cache = {};
-        this.pathProvider = pathProvider;
+        this.contentResolver = contentResolver;
     }
     get onDidChange() {
         return this._onDidChange.event;
@@ -28,10 +27,9 @@ class FileContentProvider {
             return this.cache[this.filename];
         }
 
-        // cache miss. fetch readme from npm, cache it and return content.
-        // capture context.
+        // cache miss. invoke contentResolver func, get result, cache it and return content.
         var self = this;
-        return utils.getPackageReadMe(this.filename)
+        return this.contentResolver(this.filename)
             .then((text) => {
                 self.cache[self.filename] = text;
                 return text;
