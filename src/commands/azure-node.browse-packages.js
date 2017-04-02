@@ -12,6 +12,9 @@ exports.createCommand = function createCommand(state) {
   const SCHEME = 'readmepreview';
   // This will show up as the tab title.
   const PATH = 'readme.md';
+  // TODO: expose this as a choice for end-user on how they prefer to dock preview pane.
+  const SHOW_MD_PREVIEW_CMDS = ['markdown.showPreview', 'markdown.showPreviewToSide'];
+  const SHOW_MD_PREVIEW = SHOW_MD_PREVIEW_CMDS[0];
   // Since we want to reuse a single preview pane, we define one uri up front to reuse.
   const URI = new vscode.Uri().with({ scheme: SCHEME, path: PATH });
   const contentResolver = (filename) => utils.getPackageReadMe(filename);
@@ -20,16 +23,11 @@ exports.createCommand = function createCommand(state) {
 
   vscode.commands.registerCommand('Azure-Node.browse-packages', function () {
 
-    // Open a document with the predefined URI.
+    // Open a document with the predefined URI but do not show it in the editor.
     vscode.workspace.openTextDocument(URI)
       .then(() => {
-        // show the document (readme.md) and then show its preview or show only its preview.
-        // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.One;
-        // return vscode.window.showTextDocument(doc, column, true)
-        //   .then(() => vscode.commands.executeCommand('markdown.showPreview', URI));
-        return vscode.commands.executeCommand('markdown.showPreview', URI); 
-        // another option is to show preview in the split window pane.
-        /*showPreviewToSide */
+        // directly show the document preview without showing the document.
+        return vscode.commands.executeCommand(SHOW_MD_PREVIEW, URI);
       }).then(() => {
 
         // prepare packages to present in quick pick.
