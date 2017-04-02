@@ -143,16 +143,20 @@ exports.getPackageReadMe = function getPackageReadMe(pkgName) {
         var npmUrl = `https://registry.npmjs.org/${pkgName}`;
         get.concat(npmUrl, function (err, res, data) {
             if (err) {
-                reject('error occured fetching readme for this package');
+                reject('Error occured fetching readme for this package');
             }
             try {
                 data = JSON.parse(data.toString());
+                if(!data.readme){
+                    reject(`No README.md found for ${pkgName}`);
+                }
+
                 resolve(data.readme);
             } catch (err) {
-                reject(new Error(pkgName + ': cannot parse registry data: ' + err.message));
+                reject(`Error occurred parsing registry data for ${pkgName}: ${err.message}`);
             }
         });
     });
-    
+
     return promise;
 };
