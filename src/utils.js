@@ -3,6 +3,7 @@ var path = require('path');
 var vscode = require('vscode');
 let exec = require('child_process').exec;
 var npm = require('npm');
+var get = require('simple-get');
 
 // checks if there exists a valid installation of NodeJs on this machine
 exports.isNodeInstalled = function isNodeInstalled() {
@@ -134,5 +135,24 @@ exports.install = function install(pkgName, options) {
         });
     });
 
+    return promise;
+};
+
+exports.getPackageReadMe = function getPackageReadMe(pkgName) {
+    var promise = new Promise(function (resolve, reject) {
+        var npmUrl = `https://registry.npmjs.org/${pkgName}`;
+        get.concat(npmUrl, function (err, res, data) {
+            if (err) {
+                reject('error occured fetching readme for this package');
+            }
+            try {
+                data = JSON.parse(data.toString());
+                resolve(data.readme);
+            } catch (err) {
+                reject(new Error(pkgName + ': cannot parse registry data: ' + err.message));
+            }
+        });
+    });
+    
     return promise;
 };

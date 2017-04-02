@@ -1,33 +1,60 @@
 var fs = require('fs');
 var path = require('path');
 var vscode = require('vscode');
-var npmUserPackages = require('npm-user-packages');
 var jsonEditor = require('../codegen/jsoneditor');
 var utils = require('../utils');
 var codegen = require('../codegen/codegen.browse-packages');
+var FileContentProvider = require("../providers/FileContentProvider");
 
-exports.createCommand = function createCommand() {
+exports.createCommand = function createCommand(state) {
+
+  // The scheme to provide content for (i.e the 'file' part of 'file://<filepath>').
+  const SCHEME = 'readmepreview';
+  // This will show up as the tab title.
+  const PATH = 'readme.md';
+  // Since we want to reuse a single preview pane, we define one uri up front to reuse.
+  const URI = new vscode.Uri().with({ scheme: SCHEME, path: PATH });
+  const pathProvider = (filename) => filename;
+  const provider = new FileContentProvider(URI, pathProvider);
+  vscode.workspace.registerTextDocumentContentProvider(SCHEME, provider);
+
   vscode.commands.registerCommand('Azure-Node.browse-packages', function () {
-    npmUserPackages('windowsazure').then(data => {
-      var pkgs = [];
-      data.forEach(function (item) {
-        pkgs.push({ "label": item.name, "description": item.version, "detail": item.description });
+
+    // Open a document with the predefined URI.
+    vscode.workspace.openTextDocument(URI)
+      .then(() => {
+        // show the document (readme.md) and then show its preview or show only its preview.
+        // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.One;
+        // return vscode.window.showTextDocument(doc, column, true)
+        //   .then(() => vscode.commands.executeCommand('markdown.showPreview', URI));
+        return vscode.commands.executeCommand('markdown.showPreview', URI); 
+        // another option is to show preview in the split window pane.
+        /*showPreviewToSide */
+      }).then(() => {
+
+        // prepare packages to present in quick pick.
+        var data = state.packages;
+        var pkgs = [];
+        data.forEach(function (item) {
+          pkgs.push({ "label": item.name, "description": item.version, "detail": item.description });
+        });
+
+        vscode.window.showQuickPick(pkgs, { onDidSelectItem: (pkg) => provider.update(pkg.label) })
+          .then((selectedItem) => {
+            if (!selectedItem) {
+              return;
+            }
+
+            // when a package is selected, install it and import it in active document.
+            updatePackageJsonAndNpmInstall(selectedItem.label);
+
+            if (!vscode.window.activeTextEditor) {
+              return;
+            }
+
+            return generateCodeInEditor(selectedItem.label);
+          });
       });
-
-      vscode.window.showQuickPick(pkgs).then((selectedItem) => {
-        if(!selectedItem){
-          return;
-        }
-        
-        updatePackageJsonAndNpmInstall(selectedItem.label);
-
-        if (!vscode.window.activeTextEditor) {
-          return;
-        }
-
-        return generateCodeInEditor(selectedItem.label);
-      });
-    });
   });
 };
 
@@ -37,7 +64,7 @@ function updatePackageJsonAndNpmInstall(packageToAdd) {
   if (filePath && fs.existsSync(filePath)) {
     var packages = [packageToAdd];
     jsonEditor.addDependenciesIfRequired(filePath, packages);
-    
+
     // TODO: run npm-install only if package.json was touched
     var npmOptions = {
       prefix: filePath.slice(0, filePath.lastIndexOf(path.sep))
@@ -49,7 +76,7 @@ function updatePackageJsonAndNpmInstall(packageToAdd) {
         vscode.window.setStatusBarMessage(`npm install succeeded for ${packageToAdd}.`);
       },
       function onRejected() {
-        vscode.window.setStatusBarMessage(`npm install failed for ${packageToAdd}.`);        
+        vscode.window.setStatusBarMessage(`npm install failed for ${packageToAdd}.`);
       }
     );
   }

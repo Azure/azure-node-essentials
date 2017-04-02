@@ -2,19 +2,22 @@ let vscode = require('vscode');
 let path = require('path');
 let fs = require('fs');
 let utils = require('./utils');
+var npmUserPackages = require('npm-user-packages');
 
+var state = {};
 // Called once to activate the extension.
 // The only thing this extension needs to do is to ensure that a certain npm package is installed globally.
 // Ideally this should be done during install time, but VSCode does not support install time tasks.
 // So, we do this on activation. Ideally, this is a one time task.
 function activate(context) {
 
+    populateState();
     // Register commands.
     var commandFilesPath = path.join(context.extensionPath, 'src', 'commands');
     fs.readdir(commandFilesPath, (err, files) => {
         files.forEach((file) => {
             context.subscriptions.push(
-                require('./commands/' + path.basename(file, '.js')).createCommand()
+                require('./commands/' + path.basename(file, '.js')).createCommand(state)
             );
             console.log(path.basename(file, '.js') + ' command added');
         });
@@ -22,6 +25,10 @@ function activate(context) {
 
     // Install dependencies.
     ensureDependenciesAreInstalled();
+}
+
+function populateState(){
+    return npmUserPackages('windowsazure').then(data => { state.packages = data; });
 }
 
 function ensureDependenciesAreInstalled() {
