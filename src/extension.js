@@ -11,7 +11,7 @@ var state = {};
 // So, we do this on activation. Ideally, this is a one time task.
 function activate(context) {
 
-    populateState();
+    initializeState();
     // Register commands.
     var commandFilesPath = path.join(context.extensionPath, 'src', 'commands');
     fs.readdir(commandFilesPath, (err, files) => {
@@ -27,8 +27,23 @@ function activate(context) {
     ensureDependenciesAreInstalled();
 }
 
-function populateState(){
+function initializeState() {
+    buildPackageCache();
+    return buildTypeMapCache();
+}
+
+function buildPackageCache() {
     return npmUserPackages('windowsazure').then(data => { state.packages = data; });
+}
+
+// TODO: Implement this for real, by parsing .d.ts files for each azure package
+// with TS compiler API, then walk the tree, collect all types for that package.
+function buildTypeMapCache() {
+    state.typeMap = new Map();
+    state.typeMap.set('ResourceManagementClient', 'azure-arm-resource');
+    state.typeMap.set('StorageManagementClient', 'azure-arm-storage');
+    state.typeMap.set('ResourceGroups', 'azure-arm-storage');
+    return;
 }
 
 function ensureDependenciesAreInstalled() {
