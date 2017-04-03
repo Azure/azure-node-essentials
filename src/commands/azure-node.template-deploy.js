@@ -6,7 +6,7 @@ var codegen = require('../codegen/codgen.template-deploy');
 var jsonEditor = require('../codegen/jsoneditor');
 var utils = require('../utils');
 
-exports.createCommand = function createCommand() {
+exports.createCommand = function createCommand(state) {
   vscode.commands.registerCommand('Azure-Node.template-deploy', function () {
 
     if (!vscode.window.activeTextEditor) {
